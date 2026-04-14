@@ -268,6 +268,7 @@
     </div>
 
   </div><!-- /questionArea -->
+  <div class="live-question-screen" id="liveQuestionScreen"></div>
 
   <!-- SUMMARY SCREEN -->
   <div class="summary-screen" id="summaryScreen">
@@ -364,6 +365,22 @@
   </div>
 
 </div><!-- /container -->
+
+<div class="question-prompt-modal" id="questionPromptModal">
+  <div class="question-prompt-card">
+    <button class="prompt-close" onclick="dismissQuestionPrompt()">×</button>
+    <div class="prompt-icon">💬</div>
+    <div class="prompt-badge">NEW QUESTION</div>
+    <h3>Live Poll Active</h3>
+    <p>The host has sent a question for all attendees</p>
+    <div class="prompt-preview">
+      <div class="prompt-question" id="promptQuestionTitle"></div>
+      <div id="promptQuestionOptions"></div>
+    </div>
+    <button class="prompt-primary" onclick="answerNowLiveQuestion()">Answer Now</button>
+    <button class="prompt-secondary" onclick="answerLaterLiveQuestion()">I'll answer later</button>
+  </div>
+</div>
 
 <script type="module" src="/js/app.js"></script>
 </body>

@@ -11,6 +11,7 @@ let profile = {name:'',email:'',company:'',industry:'',stage:'',role:''};
 let geoData = null;
 let userId = getUserId();
 let presenceInterval = null;
+let pushedQuestion = null;
 
 const MIC_SVG = `<svg class="mic-svg" viewBox="0 0 24 24"><rect x="9" y="2" width="6" height="11" rx="3"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>`;
 const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
@@ -128,6 +129,8 @@ function hideAllScreens() {
   if (summary) summary.classList.remove('active');
   const lead = document.getElementById('leadScreen');
   if (lead) lead.classList.remove('active');
+  const live = document.getElementById('liveQuestionScreen');
+  if (live) live.classList.remove('active');
 }
 
 function showCard(idx) {
@@ -252,7 +255,7 @@ function loadQuestionsFromDOM() {
 async function loadQuestionsFromDB() {
   const { data, error } = await supabase
     .from('questions')
-    .select('id,question_text,short,type,options,is_active')
+    .select('id,question_text,short,type,options,is_active,created_at')
     .eq('session_id', CURRENT_SESSION_ID)
     .eq('is_active', true)
     .order('created_at');
@@ -269,9 +272,135 @@ async function loadQuestionsFromDB() {
       theme: q.question_text,
       type: q.type,
       options: q.options,
+      createdAt: q.created_at,
       index: i
     }));
   }
+}
+
+function closeQuestionPrompt() {
+  const modal = document.getElementById('questionPromptModal');
+  if (modal) modal.classList.remove('show');
+}
+
+function showQuestionPrompt(q) {
+  if (!q) return;
+  const modal = document.getElementById('questionPromptModal');
+  const title = document.getElementById('promptQuestionTitle');
+  const options = document.getElementById('promptQuestionOptions');
+  if (!modal || !title || !options) return;
+  title.textContent = q.short || q.question_text || 'New question';
+
+  const opts = Array.isArray(q.options) ? q.options : [];
+  options.innerHTML = opts.length > 0
+    ? opts.slice(0, 2).map(opt => `<div class="prompt-option">${escapeHtml(opt)}</div>`).join('') + (opts.length > 2 ? `<div class="prompt-more">+${opts.length - 2} more options</div>` : '')
+    : '<div class="prompt-option">Open text response</div>';
+
+  modal.classList.add('show');
+}
+
+function renderLiveQuestionPage(q) {
+  const live = document.getElementById('liveQuestionScreen');
+  if (!live) return;
+
+  const options = Array.isArray(q.options) ? q.options : [];
+  const isMcq = q.type === 'mcq' && options.length > 0;
+
+  live.innerHTML = `
+    <div class="live-question-wrap">
+      <div class="live-question-head">
+        <button class="live-back-btn" onclick="backToDiscoveryFromLive()">← Live Q&A</button>
+      </div>
+      <div class="live-tag">New Question</div>
+      <h2 class="live-title">${escapeHtml(q.short || q.question_text || 'Question')}</h2>
+      <p class="live-sub">Select one option below</p>
+      <form id="liveQuestionForm" class="live-form">
+        ${isMcq ? options.map((opt, idx) => `
+          <label class="live-option">
+            <span>${escapeHtml(opt)}</span>
+            <input type="radio" name="live_option" value="${escapeHtml(opt)}" ${idx === 0 ? '' : ''}>
+          </label>
+        `).join('') : `
+          <textarea id="liveTextAnswer" class="live-text" placeholder="Type your response..."></textarea>
+        `}
+        <button type="submit" id="liveSubmitBtn" class="live-submit" disabled>Submit Response</button>
+      </form>
+      <div id="liveSubmitStatus" class="live-status"></div>
+    </div>
+  `;
+
+  const form = document.getElementById('liveQuestionForm');
+  const submit = document.getElementById('liveSubmitBtn');
+  if (!form || !submit) return;
+
+  const updateSubmitState = () => {
+    const selected = form.querySelector('input[name="live_option"]:checked');
+    const text = document.getElementById('liveTextAnswer')?.value.trim();
+    submit.disabled = !(selected || text);
+  };
+
+  form.addEventListener('change', updateSubmitState);
+  form.addEventListener('input', updateSubmitState);
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    submit.disabled = true;
+    const selected = form.querySelector('input[name="live_option"]:checked');
+    const text = document.getElementById('liveTextAnswer')?.value.trim() || '';
+    const answer = selected
+      ? { selections: [selected.value], text: '' }
+      : { selections: [], text };
+    await saveResponse(q.id, answer);
+    const status = document.getElementById('liveSubmitStatus');
+    if (status) status.textContent = '✓ Response submitted';
+    setTimeout(() => {
+      backToDiscoveryFromLive();
+    }, 600);
+  });
+}
+
+window.backToDiscoveryFromLive = function() {
+  const live = document.getElementById('liveQuestionScreen');
+  if (live) live.classList.remove('active');
+  const qArea = document.getElementById('questionArea');
+  if (qArea) qArea.style.display = '';
+};
+
+window.answerNowLiveQuestion = function() {
+  closeQuestionPrompt();
+  const qArea = document.getElementById('questionArea');
+  if (qArea) qArea.style.display = 'none';
+  hideAllScreens();
+  const live = document.getElementById('liveQuestionScreen');
+  if (!live || !pushedQuestion) return;
+  renderLiveQuestionPage(pushedQuestion);
+  live.classList.add('active');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+};
+
+window.answerLaterLiveQuestion = function() {
+  closeQuestionPrompt();
+};
+
+window.dismissQuestionPrompt = function() {
+  closeQuestionPrompt();
+};
+
+async function hasAnswered(questionId) {
+  const { data } = await supabase
+    .from('responses')
+    .select('question_id')
+    .eq('session_id', CURRENT_SESSION_ID)
+    .eq('question_id', questionId)
+    .eq('user_id', userId)
+    .maybeSingle();
+  return !!data;
+}
+
+async function handleQuestionPush(questionRow) {
+  if (!questionRow || !questionRow.is_active) return;
+  if (await hasAnswered(questionRow.id)) return;
+  pushedQuestion = questionRow;
+  showQuestionPrompt(questionRow);
 }
 
 /* ─── SUMMARY ────────────────────────────────────────────────────────────────── */
@@ -602,6 +731,28 @@ function subscribeToResponses() {
     .subscribe();
 }
 
+function subscribeToQuestionPushes() {
+  supabase
+    .channel('question-push-channel')
+    .on('postgres_changes', {
+      event: 'INSERT',
+      schema: 'public',
+      table: 'questions',
+      filter: `session_id=eq.${CURRENT_SESSION_ID}`
+    }, async (payload) => {
+      await handleQuestionPush(payload.new);
+    })
+    .on('postgres_changes', {
+      event: 'UPDATE',
+      schema: 'public',
+      table: 'questions',
+      filter: `session_id=eq.${CURRENT_SESSION_ID}`
+    }, async (payload) => {
+      await handleQuestionPush(payload.new);
+    })
+    .subscribe();
+}
+
 /* ─── INIT ───────────────────────────────────────────────────────────────────── */
 async function init() {
   console.log('App initializing...');
@@ -620,6 +771,7 @@ async function init() {
   
   attachOptionListeners();
   subscribeToResponses();
+  subscribeToQuestionPushes();
   updateProgress(0);
 }
 
