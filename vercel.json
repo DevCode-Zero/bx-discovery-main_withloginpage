@@ -1,0 +1,28 @@
+{
+  "routes": [
+    {
+      "src": "/api/health",
+      "dest": "api/health.py"
+    },
+    {
+      "src": "/api/login",
+      "dest": "api/login.py"
+    },
+    {
+      "src": "/api/generate",
+      "dest": "api/generate.py"
+    },
+    {
+      "src": "/discovery",
+      "dest": "public/discovery/index.html"
+    },
+    {
+      "src": "/discovery/(.*)",
+      "dest": "public/discovery/$1"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "public/$1"
+    }
+  ]
+}

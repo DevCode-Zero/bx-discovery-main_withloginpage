@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BX Consulting — Admin Portal</title>
+<link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+
+<div class="bx">
+  <div class="bx-stripe"></div>
+  <div class="bx-bar">
+    <div>
+      <div class="brand-name">BX Consulting</div>
+      <div class="brand-tag">Strategy clarity, powered by responsible AI</div>
+    </div>
+    <div class="bx-pill">Admin portal</div>
+  </div>
+  <div class="bx-body">
+    <div class="bx-card">
+      <div class="bx-head">
+        <div class="bx-pill" style="margin-bottom:10px;">Executive Discovery</div>
+        <div class="bx-title">BX <span>Consulting</span></div>
+        <div class="bx-sub">Strategy clarity, powered by responsible AI</div>
+      </div>
+
+      <div id="admin-login">
+        <div class="bx-pw-field">
+          <label class="bx-lbl">Password</label>
+          <input class="bx-inp" type="password" id="admin-pass" placeholder="Enter admin password">
+          <div class="bx-err" id="admin-err">Incorrect password. Please try again.</div>
+        </div>
+        <button class="bx-btn-main" id="admin-btn" onclick="handleAdminLogin()">Sign in to Admin</button>
+      </div>
+
+      <div class="bx-or">
+        <div class="bx-or-line"></div>
+        <div class="bx-or-txt">or</div>
+        <div class="bx-or-line"></div>
+      </div>
+
+      <button class="bx-btn-dash" onclick="window.location.href='/discovery'">
+        <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+        Join Session
+      </button>
+
+      <div class="bx-foot">
+        <svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+        <span class="bx-foot-txt">Encrypted · Secure · BX Discovery</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  window.handleAdminLogin = async function() {
+    const passInput = document.getElementById('admin-pass');
+    const btn = document.getElementById('admin-btn');
+    const err = document.getElementById('admin-err');
+    
+    const val = passInput.value.trim();
+    if (!val) {
+      err.style.display = 'block';
+      err.textContent = 'Please enter your password.';
+      return;
+    }
+    
+    err.style.display = 'none';
+    btn.textContent = 'Signing in...';
+    btn.style.opacity = '0.7';
+    btn.disabled = true;
+    
+    try {
+      const resp = await fetch('/api/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ password: val })
+      });
+      const data = await resp.json();
+      
+      if (data.success) {
+        window.location.href = '/admin';
+      } else {
+        err.style.display = 'block';
+        err.textContent = data.error || 'Incorrect password.';
+        btn.textContent = 'Sign in to Admin';
+        btn.style.opacity = '1';
+        btn.disabled = false;
+        passInput.value = '';
+        passInput.focus();
+      }
+    } catch(e) {
+      err.style.display = 'block';
+      err.textContent = 'Connection error. Try again.';
+      btn.textContent = 'Sign in to Admin';
+      btn.style.opacity = '1';
+      btn.disabled = false;
+    }
+  };
+  
+  document.getElementById('admin-pass').addEventListener('keydown', function(e) {
+    if (e.key === 'Enter') window.handleAdminLogin();
+  });
+</script>
+
+<style>
+.bx { font-family: 'DM Sans', sans-serif; background: var(--color-background-tertiary); min-height: 100vh; display: flex; flex-direction: column; }
+.bx-stripe { height: 4px; background: linear-gradient(90deg, #1a3a5c 0%, #b86c2a 100%); }
+.bx-bar { display: flex; align-items: center; justify-content: space-between; padding: 12px 20px; background: var(--color-background-primary); border-bottom: 0.5px solid var(--color-border-tertiary); }
+.bx-name { font-family: 'Syne', sans-serif; font-size: 13px; font-weight: 700; color: #1a3a5c; letter-spacing: 0.04em; }
+.bx-tag { font-size: 10px; color: var(--color-text-tertiary); margin-top: 2px; }
+.bx-pill { display: inline-flex; align-items: center; gap: 5px; padding: 3px 10px; border: 0.5px solid var(--color-border-secondary); border-radius: 20px; font-size: 10px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: var(--color-text-secondary); }
+.bx-pill::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: #b86c2a; flex-shrink: 0; }
+.bx-body { flex: 1; display: flex; align-items: center; justify-content: center; padding: 30px 16px; }
+.bx-card { background: var(--color-background-primary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-lg); padding: 32px 28px 24px; width: 100%; max-width: 380px; }
+.bx-head { margin-bottom: 24px; }
+.bx-title { font-family: 'Syne', sans-serif; font-size: 24px; font-weight: 800; letter-spacing: -0.02em; color: var(--color-text-primary); margin: 10px 0 5px; }
+.bx-title span { color: #1a3a5c; }
+.bx-sub { font-size: 12px; color: var(--color-text-secondary); line-height: 1.6; }
+.bx-pw-field { display: flex; flex-direction: column; gap: 5px; margin-bottom: 20px; }
+.bx-lbl { font-size: 10px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--color-text-secondary); }
+.bx-inp { padding: 10px 14px; border: 0.5px solid var(--color-border-secondary); border-radius: var(--border-radius-md); background: var(--color-background-secondary); color: var(--color-text-primary); font-family: 'DM Sans', sans-serif; font-size: 13px; outline: none; transition: border-color 0.18s; width: 100%; box-sizing: border-box; }
+.bx-inp:focus { border-color: #1a3a5c; box-shadow: 0 0 0 3px rgba(26,58,92,0.09); }
+.bx-err { display: none; font-size: 11px; color: var(--color-text-danger); margin-top: -4px; margin-bottom: 8px; }
+.bx-btn-main { width: 100%; padding: 12px; border: none; border-radius: var(--border-radius-md); background: #1a3a5c; color: #fff; font-family: 'Syne', sans-serif; font-size: 13px; font-weight: 700; letter-spacing: 0.02em; cursor: pointer; transition: background 0.18s; margin-bottom: 10px; }
+.bx-btn-main:hover { background: #1e4878; }
+.bx-or { display: flex; align-items: center; gap: 10px; margin: 4px 0 10px; }
+.bx-or-line { flex: 1; height: 0.5px; background: var(--color-border-tertiary); }
+.bx-or-txt { font-size: 10px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--color-text-tertiary); }
+.bx-btn-dash { width: 100%; padding: 11px; border: 0.5px solid var(--color-border-secondary); border-radius: var(--border-radius-md); background: transparent; color: var(--color-text-primary); font-family: 'Syne', sans-serif; font-size: 12px; font-weight: 700; letter-spacing: 0.02em; cursor: pointer; transition: all 0.18s; display: flex; align-items: center; justify-content: center; gap: 8px; }
+.bx-btn-dash:hover { border-color: #b86c2a; color: #b86c2a; }
+.bx-btn-dash svg { width: 14px; height: 14px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; flex-shrink: 0; }
+.bx-foot { margin-top: 20px; padding-top: 14px; border-top: 0.5px solid var(--color-border-tertiary); display: flex; align-items: center; gap: 5px; }
+.bx-foot svg { width: 12px; height: 12px; stroke: var(--color-text-tertiary); fill: none; stroke-width: 2; stroke-linecap: round; flex-shrink: 0; }
+.bx-foot-txt { font-size: 11px; color: var(--color-text-tertiary); }
+
+@media (max-width: 480px) {
+  .bx-bar { padding: 10px 16px; }
+  .bx-pill { font-size: 9px; padding: 2px 8px; }
+  .bx-card { padding: 24px 20px 20px; border-radius: 10px; }
+  .bx-title { font-size: 22px; }
+  .bx-head { margin-bottom: 20px; }
+  .bx-body { padding: 20px 12px; }
+}
+</style>
+
+</body>
+</html>

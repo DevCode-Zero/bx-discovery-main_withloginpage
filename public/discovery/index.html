@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BX Consulting — Executive Discovery Session</title>
+<link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+
+<div class="top-stripe"></div>
+
+<div class="brand-bar">
+  <div>
+    <div class="brand-name"> BX Consulting</div>
+    <div class="brand-tag">Strategy clarity, powered by responsible AI</div>
+  </div>
+  <button class="restart-link" onclick="restartInterview()">↺ Start over</button>
+</div>
+
+<div class="container">
+
+  <!-- HEADER -->
+  <header class="header">
+    <div class="header-badge">Pre-Discovery · Executive Interview</div>
+    <h1>Business Intelligence<br><em>Discovery Session</em></h1>
+    <p class="header-sub">Five strategic questions that anchor a precision-built discovery workshop. Choose from options, type freely, or speak your answer. Takes 8–12 minutes.</p>
+
+    <!-- OPTIONAL PROFILE TEASER -->
+    <div class="profile-teaser" id="profileTeaser">
+      <div class="profile-teaser-text">
+        <strong>Get a personalised experience.</strong> Share your industry and company stage and we'll tailor the answer choices to your world — same questions, sharper context.
+      </div>
+      <button class="profile-toggle-btn" onclick="toggleProfile()">Personalise →</button>
+    </div>
+
+    <!-- PROFILE PANEL -->
+    <div class="profile-panel" id="profilePanel">
+      <div class="profile-grid">
+        <div class="profile-field">
+          <label>First name <span id="nameReq" style="color:var(--danger);display:none">*</span><span id="nameOpt" style="font-weight:400;color:var(--muted);text-transform:none;letter-spacing:0"> (optional)</span></label>
+          <input type="text" id="pName" placeholder="Sarah">
+        </div>
+        <div class="profile-field">
+          <label>Work email <span id="emailReq" style="color:var(--danger);display:none">*</span><span id="emailOpt" style="font-weight:400;color:var(--muted);text-transform:none;letter-spacing:0"> (optional)</span></label>
+          <input type="email" id="pEmail" placeholder="sarah@company.com">
+        </div>
+        <div class="profile-field full">
+          <label>Company name <span id="companyReq" style="color:var(--danger);display:none">*</span><span id="companyOpt" style="font-weight:400;color:var(--muted);text-transform:none;letter-spacing:0"> (optional)</span></label>
+          <input type="text" id="pCompany" placeholder="Acme Corp">
+        </div>
+        <div class="profile-field">
+          <label>Industry <span id="industryReq" style="color:var(--danger);display:none">*</span></label>
+          <select id="pIndustry" onchange="onProfileSelect()">
+            <option value="">— Select —</option>
+            <option value="SaaS / Technology">SaaS / Technology</option>
+            <option value="Manufacturing">Manufacturing</option>
+            <option value="Financial Services">Financial Services</option>
+            <option value="Healthcare / Life Sciences">Healthcare / Life Sciences</option>
+            <option value="Retail / Consumer">Retail / Consumer</option>
+            <option value="Logistics / Supply Chain">Logistics / Supply Chain</option>
+            <option value="Professional Services">Professional Services</option>
+            <option value="Government / Public Sector">Government / Public Sector</option>
+            <option value="Real Estate / Infrastructure">Real Estate / Infrastructure</option>
+            <option value="Education">Education</option>
+            <option value="Other">Other</option>
+          </select>
+        </div>
+        <div class="profile-field">
+          <label>Company stage <span id="stageReq" style="color:var(--danger);display:none">*</span></label>
+          <select id="pStage" onchange="onProfileSelect()">
+            <option value="">— Select —</option>
+            <option value="Early stage / startup">Early stage / startup</option>
+            <option value="Growth / scale-up">Growth / scale-up</option>
+            <option value="Mid-market">Mid-market</option>
+            <option value="Enterprise / large corp">Enterprise / large corp</option>
+            <option value="Family business">Family business</option>
+            <option value="PE / investor-backed">PE / investor-backed</option>
+          </select>
+        </div>
+        <div class="profile-field">
+          <label>Your role</label>
+          <select id="pRole">
+            <option value="">— Select —</option>
+            <option value="CEO / MD / Founder">CEO / MD / Founder</option>
+            <option value="COO">COO</option>
+            <option value="CFO">CFO</option>
+            <option value="CTO / CPO">CTO / CPO</option>
+            <option value="SVP / VP">SVP / VP</option>
+            <option value="Director">Director</option>
+            <option value="Strategy / Planning">Strategy / Planning</option>
+          </select>
+        </div>
+      </div>
+      <p class="profile-note" id="profileNote">All fields are optional. Share what you're comfortable with — we'll use it only to personalise your experience.</p>
+      <p class="profile-note" id="profileNoteRequired" style="display:none;color:var(--accent2);">Once you select an industry or stage, name, email and company become required so we can deliver your personalised report.</p>
+      <button class="profile-save-btn" onclick="saveProfile()">Apply personalisation</button>
+      <span class="profile-saved-badge" id="profileSavedBadge">✓ Applied</span>
+    </div>
+
+    <div class="geo-badge" id="geoBadge">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+      <span id="geoText"></span>
+    </div>
+
+    <div class="progress-wrap">
+      <div class="step-dots" id="stepDots">
+        <div class="step-dot active"></div>
+        <div class="step-dot"></div>
+        <div class="step-dot"></div>
+        <div class="step-dot"></div>
+        <div class="step-dot"></div>
+      </div>
+      <div class="progress-label" id="progressLabel">Question 1 of 5 · ~2 min remaining</div>
+    </div>
+  </header>
+
+  <!-- QUESTION AREA -->
+  <div class="question-area" id="questionArea">
+
+    <!-- Q1 -->
+    <div class="question-card active" data-q="0">
+      <div class="q-eyebrow"><span class="dot"></span> Question 01 &nbsp;·&nbsp; <span class="q-theme">Vision + Mission</span></div>
+      <div class="q-text">What is the vision of the business for the next 12–36 months, and what does winning look like for you?</div>
+      <div class="q-hint"><span class="q-hint-icon">💡</span><p>Think beyond revenue — consider your market position, competitive moat, and the story you want to be telling three years from now.</p></div>
+      <div class="options-section">
+        <div class="options-label">Select all that apply</div>
+        <div class="options-grid" data-multi="true" data-q="0">
+          <button class="option-pill" data-value="Market leadership in our category">Market leadership in category<span class="pill-tip">Dominant position · pricing power</span></button>
+          <button class="option-pill" data-value="Significant profitability improvement">Profitability improvement<span class="pill-tip">Margin expansion · EBITDA focus</span></button>
+          <button class="option-pill" data-value="Geographic or segment expansion">Geographic expansion<span class="pill-tip">New markets · revenue diversification</span></button>
+          <button class="option-pill" data-value="Operational resilience and risk-proofing">Operational resilience<span class="pill-tip">Downside protection · continuity</span></button>
+          <button class="option-pill" data-value="Digital or Intelligent transformation advantage">Digital or Intelligent transformation advantage<span class="pill-tip">Tech-led competitive edge</span></button>
+          <button class="option-pill" data-value="Best-in-class customer experience">Best-in-class customer experience<span class="pill-tip">Retention · NPS · loyalty</span></button>
+          <button class="option-pill" data-value="M&amp;A or ecosystem growth play">M&amp;A / ecosystem play<span class="pill-tip">Inorganic scale · capability buy</span></button>
+          <button class="option-pill" data-value="IPO or exit readiness">IPO / exit readiness<span class="pill-tip">Investor story · valuation clarity</span></button>
+        </div>
+      </div>
+      <div class="input-section">
+        <div class="divider-label"><span>Or describe in your own words</span></div>
+        <textarea class="response-input" placeholder="e.g. 'We want to be the default platform for mid-market logistics in South Asia by 2027...'"></textarea>
+        <div class="voice-row">
+          <button class="voice-btn" onclick="toggleVoice(this,0)"><svg class="mic-svg" viewBox="0 0 24 24"><rect x="9" y="2" width="6" height="11" rx="3"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>Speak response</button>
+          <span class="voice-status" id="voiceStatus0"></span>
+        </div>
+      </div>
+      <div class="action-row"><div></div><button class="btn-next" onclick="nextQ(0)">Continue →</button></div>
+    </div>
+
+    <!-- Q2 -->
+    <div class="question-card" data-q="1">
+      <div class="q-eyebrow"><span class="dot"></span> Question 02 &nbsp;·&nbsp; <span class="q-theme">Annual Objective</span></div>
+      <div class="q-text">What is the single most important business goal for this year?</div>
+      <div class="q-hint"><span class="q-hint-icon">🎯</span><p>Be specific — a number, a rate, or a milestone. The sharper the target, the more precise the workshop design.</p></div>
+      <div class="options-section">
+        <div class="options-label">Choose the closest match</div>
+        <div class="options-grid" data-multi="false" data-q="1">
+          <button class="option-pill" data-value="2X revenue growth">2X revenue growth<span class="pill-tip">Volume · aggressive scale</span></button>
+          <button class="option-pill" data-value="+20–30% top-line revenue increase">+20–30% revenue growth<span class="pill-tip">Sustained top-line momentum</span></button>
+          <button class="option-pill" data-value="EBITDA / margin improvement">EBITDA / margin improvement<span class="pill-tip">Profitability · investor readiness</span></button>
+          <button class="option-pill" data-value="Measurable market share gain">Market share gain<span class="pill-tip">Competitive displacement</span></button>
+          <button class="option-pill" data-value="Working capital / cash flow improvement">Working capital improvement<span class="pill-tip">Cash runway · collection cycles</span></button>
+          <button class="option-pill" data-value="Improve customer retention rate">Customer retention target<span class="pill-tip">Churn reduction · LTV growth</span></button>
+          <button class="option-pill" data-value="Launch a new product or enter a new market">New product / market launch<span class="pill-tip">Innovation · category creation</span></button>
+          <button class="option-pill" data-value="Operational cost reduction">Operational cost reduction<span class="pill-tip">Efficiency · margin protection</span></button>
+        </div>
+      </div>
+      <div class="input-section">
+        <div class="divider-label"><span>Or be specific with a number</span></div>
+        <textarea class="response-input" placeholder="e.g. 'Grow from $40M to $60M ARR by Q4' or 'Hit 15% EBITDA margin by year-end'..."></textarea>
+        <div class="voice-row">
+          <button class="voice-btn" onclick="toggleVoice(this,1)"><svg class="mic-svg" viewBox="0 0 24 24"><rect x="9" y="2" width="6" height="11" rx="3"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>Speak response</button>
+          <span class="voice-status" id="voiceStatus1"></span>
+        </div>
+      </div>
+      <div class="action-row"><button class="btn-back" onclick="prevQ(1)">← Back</button><button class="btn-next" onclick="nextQ(1)">Continue →</button></div>
+    </div>
+
+    <!-- Q3 -->
+    <div class="question-card" data-q="2">
+      <div class="q-eyebrow"><span class="dot"></span> Question 03 &nbsp;·&nbsp; <span class="q-theme">Execution Thesis</span></div>
+      <div class="q-text">What are the 2–3 biggest levers that will actually drive this growth?</div>
+      <div class="q-hint"><span class="q-hint-icon">⚙️</span><p>Not aspirations — mechanics. How will money move? What has to change inside the business to unlock the number?</p></div>
+      <div class="options-section">
+        <div class="options-label">Select up to 3 primary levers</div>
+        <div class="options-grid" data-multi="true" data-max="3" data-q="2">
+          <button class="option-pill" data-value="Pricing strategy optimisation">Pricing optimisation<span class="pill-tip">Margin · volume trade-off</span></button>
+          <button class="option-pill" data-value="Distribution / channel expansion">Distribution expansion<span class="pill-tip">Reach · new shelf space</span></button>
+          <button class="option-pill" data-value="Digital and e-commerce channel growth">Digital channel growth<span class="pill-tip">Scale · lower cost-to-serve</span></button>
+          <button class="option-pill" data-value="Product or service innovation">Product innovation<span class="pill-tip">Differentiation · price premium</span></button>
+          <button class="option-pill" data-value="Operational scaling and automation">Operational scaling<span class="pill-tip">Unit cost reduction · throughput</span></button>
+          <button class="option-pill" data-value="Partner and ecosystem development">Partner ecosystem<span class="pill-tip">Leverage · shared growth risk</span></button>
+          <button class="option-pill" data-value="Sales team productivity uplift">Sales productivity<span class="pill-tip">Revenue per head · faster close</span></button>
+          <button class="option-pill" data-value="M&amp;A or bolt-on acquisitions">M&amp;A / acquisitions<span class="pill-tip">Inorganic volume · capability buy</span></button>
+          <button class="option-pill" data-value="Talent and leadership investment">Talent investment<span class="pill-tip">Execution quality · retention</span></button>
+          <button class="option-pill" data-value="Geographic market entry">New market entry<span class="pill-tip">Addressable market expansion</span></button>
+        </div>
+      </div>
+      <div class="input-section">
+        <div class="divider-label"><span>Or describe your growth thesis</span></div>
+        <textarea class="response-input" placeholder="e.g. 'We're tripling the field sales force, launching a self-serve portal, and entering Southeast Asia with a local partner'..."></textarea>
+        <div class="voice-row">
+          <button class="voice-btn" onclick="toggleVoice(this,2)"><svg class="mic-svg" viewBox="0 0 24 24"><rect x="9" y="2" width="6" height="11" rx="3"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>Speak response</button>
+          <span class="voice-status" id="voiceStatus2"></span>
+        </div>
+      </div>
+      <div class="action-row"><button class="btn-back" onclick="prevQ(2)">← Back</button><button class="btn-next" onclick="nextQ(2)">Continue →</button></div>
+    </div>
+
+    <!-- Q4 -->
+    <div class="question-card" data-q="3">
+      <div class="q-eyebrow"><span class="dot"></span> Question 04 &nbsp;·&nbsp; <span class="q-theme">Customer &amp; Market Focus</span></div>
+      <div class="q-text">Which customer segments or markets matter most for achieving this target?</div>
+      <div class="q-hint"><span class="q-hint-icon">🌍</span><p>Think in terms of where your highest-value growth originates — not just your largest existing base or most vocal customers.</p></div>
+      <div class="options-section">
+        <div class="options-label">Select all relevant customer types</div>
+        <div class="options-grid" data-multi="true" data-q="3">
+          <button class="option-pill" data-value="Enterprise / large accounts">Enterprise accounts<span class="pill-tip">High ACV · long cycles</span></button>
+          <button class="option-pill" data-value="Mid-market companies">Mid-market<span class="pill-tip">Volume + value balance</span></button>
+          <button class="option-pill" data-value="SMB / small business segment">SMB segment<span class="pill-tip">Scale · product-led growth</span></button>
+          <button class="option-pill" data-value="Strategic and named accounts">Strategic / named accounts<span class="pill-tip">Anchor revenue · deep partnership</span></button>
+          <button class="option-pill" data-value="Direct consumers (B2C)">Direct consumers (B2C)<span class="pill-tip">Brand · D2C margin</span></button>
+          <button class="option-pill" data-value="Government and public sector">Government / public sector<span class="pill-tip">Stable · procurement-led</span></button>
+          <button class="option-pill" data-value="Channel partners and resellers">Channel partners<span class="pill-tip">Leverage · reach multiplier</span></button>
+          <button class="option-pill" data-value="International and emerging markets">International markets<span class="pill-tip">Untapped TAM · first-mover</span></button>
+        </div>
+      </div>
+      <div class="input-section">
+        <div class="divider-label"><span>Add geographies, industries, named accounts</span></div>
+        <textarea class="response-input" placeholder="e.g. 'Top 3 verticals: manufacturing, logistics, retail. Key geos: India, UAE, Singapore. 5 named accounts = 40% of revenue'..."></textarea>
+        <div class="voice-row">
+          <button class="voice-btn" onclick="toggleVoice(this,3)"><svg class="mic-svg" viewBox="0 0 24 24"><rect x="9" y="2" width="6" height="11" rx="3"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>Speak response</button>
+          <span class="voice-status" id="voiceStatus3"></span>
+        </div>
+      </div>
+      <div class="action-row"><button class="btn-back" onclick="prevQ(3)">← Back</button><button class="btn-next" onclick="nextQ(3)">Continue →</button></div>
+    </div>
+
+    <!-- Q5 -->
+    <div class="question-card" data-q="4">
+      <div class="q-eyebrow"><span class="dot"></span> Question 05 &nbsp;·&nbsp; <span class="q-theme">Current Reality Check</span></div>
+      <div class="q-text">What is currently stopping you from achieving that growth faster?</div>
+      <div class="q-hint"><span class="q-hint-icon">🔍</span><p>Name the real constraints — not the polished version. The honest answer here is exactly where the workshop does its sharpest work.</p></div>
+      <div class="options-section">
+        <div class="options-label">Select your biggest blockers</div>
+        <div class="options-grid" data-multi="true" data-q="4">
+          <button class="option-pill" data-value="Demand generation / pipeline constraints">Demand constraints<span class="pill-tip">Top of funnel · awareness gap</span></button>
+          <button class="option-pill" data-value="Production or delivery capacity limits">Capacity constraints<span class="pill-tip">Supply-side bottleneck</span></button>
+          <button class="option-pill" data-value="Supply chain or procurement gaps">Supply chain gaps<span class="pill-tip">Input reliability · cost volatility</span></button>
+          <button class="option-pill" data-value="Sales team productivity or capability gaps">Sales productivity<span class="pill-tip">Win rate · quota attainment</span></button>
+          <button class="option-pill" data-value="Credit, collections or cash flow issues">Credit / collections<span class="pill-tip">Working capital drain</span></button>
+          <button class="option-pill" data-value="Regulatory or compliance friction">Regulatory friction<span class="pill-tip">Speed to market · cost of compliance</span></button>
+          <button class="option-pill" data-value="Technology or data infrastructure gaps">Technology gaps<span class="pill-tip">Tech debt · data blindspots</span></button>
+          <button class="option-pill" data-value="Talent gaps or org design issues">Talent / org design<span class="pill-tip">Capability · structure fit</span></button>
+          <button class="option-pill" data-value="Product-market fit or differentiation weakness">Product-market fit<span class="pill-tip">Value prop · competitive moat</span></button>
+          <button class="option-pill" data-value="Leadership alignment or slow decision-making">Leadership alignment<span class="pill-tip">Decision speed · org politics</span></button>
+        </div>
+      </div>
+      <div class="input-section">
+        <div class="divider-label"><span>Tell us what's really going on</span></div>
+        <textarea class="response-input" placeholder="e.g. 'Our biggest issue is hiring — we can't find senior sales talent, and our CRM is 8 years old'..."></textarea>
+        <div class="voice-row">
+          <button class="voice-btn" onclick="toggleVoice(this,4)"><svg class="mic-svg" viewBox="0 0 24 24"><rect x="9" y="2" width="6" height="11" rx="3"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>Speak response</button>
+          <span class="voice-status" id="voiceStatus4"></span>
+        </div>
+      </div>
+      <div class="action-row"><button class="btn-back" onclick="prevQ(4)">← Back</button><button class="btn-next" onclick="showSummary()">Review Answers →</button></div>
+    </div>
+
+  </div><!-- /questionArea -->
+
+  <!-- SUMMARY SCREEN -->
+  <div class="summary-screen" id="summaryScreen">
+    <div class="screen-header">
+      <div class="screen-tag">✓ Interview complete</div>
+      <div class="screen-title">Your Discovery Brief</div>
+      <p class="screen-sub">Review your answers. When ready, generate a tailored workshop design built around your strategic context.</p>
+    </div>
+    <div class="summary-cards" id="summaryCards"></div>
+    <button class="generate-btn" onclick="generateWorkshop()">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+      Generate Discovery Workshop Design
+    </button>
+  </div>
+
+  <!-- WORKSHOP SCREEN -->
+  <div class="workshop-screen" id="workshopScreen">
+    <div class="screen-header">
+      <div class="screen-tag blue">Workshop Design</div>
+      <div class="screen-title">Your Discovery Workshop Plan</div>
+      <p class="screen-sub">Generated from your executive interview. Ready to share with your facilitation team.</p>
+    </div>
+    <div class="workshop-output" id="workshopOutput">
+      <div class="loading-state">Building your workshop plan <div class="dots"><span></span><span></span><span></span></div></div>
+    </div>
+    <div class="output-actions" id="outputActions" style="display:none;">
+      <button class="action-btn primary" onclick="copyWorkshop()">Copy to clipboard</button>
+      <button class="action-btn" onclick="showLeadCapture()">Get benchmarked report →</button>
+      <button class="action-btn" onclick="editAnswers()">Edit my answers</button>
+      <button class="action-btn" onclick="restartInterview()">Start new interview</button>
+    </div>
+    <div id="updateNotice" style="display:none;margin-top:16px;padding:14px 18px;background:var(--accent2-light);border:1px solid rgba(184,108,42,0.2);border-radius:8px;font-size:12px;color:var(--text2);line-height:1.7;">
+      <strong style="color:var(--accent2);">Want a fresh report?</strong> You can edit your answers and regenerate at any time during this session.
+    </div>
+  </div>
+
+  <!-- LEAD CAPTURE SCREEN -->
+  <div class="lead-screen" id="leadScreen">
+    <div class="screen-header">
+      <div class="screen-tag blue">Intelligence Report</div>
+      <div class="screen-title">Get your benchmarked report</div>
+      <p class="screen-sub">Your workshop plan is ready above. Share your details and we'll send you something worth more.</p>
+    </div>
+    <div class="lead-card">
+      <div id="leadForm">
+        <div class="lead-value-badge">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+          Benchmarked intelligence
+        </div>
+        <div class="lead-title">Share your details and we'll send you a benchmarked intelligence report</div>
+        <p class="lead-sub">See how your growth priorities compare against senior executives in your industry.</p>
+        <div class="lead-grid">
+          <div class="lead-field">
+            <label>First name <span style="color:var(--danger)">*</span></label>
+            <input type="text" id="lFirst" placeholder="Sarah">
+          </div>
+          <div class="lead-field">
+            <label>Last name <span style="font-weight:400;color:var(--muted)">(optional)</span></label>
+            <input type="text" id="lLast" placeholder="Chen">
+          </div>
+          <div class="lead-field full">
+            <label>Work email <span style="color:var(--danger)">*</span></label>
+            <input type="email" id="lEmail" placeholder="sarah@company.com">
+          </div>
+          <div class="lead-field full">
+            <label>Company name <span style="color:var(--danger)">*</span></label>
+            <input type="text" id="lCompany" placeholder="Acme Corp">
+          </div>
+          <div class="lead-field full">
+            <label>Website <span style="font-weight:400;color:var(--muted)">(optional)</span></label>
+            <input type="url" id="lUrl" placeholder="https://acmecorp.com">
+          </div>
+          <div class="lead-field full">
+            <label>Anything specific you'd like us to address? <span style="font-weight:400;color:var(--muted)">(optional)</span></label>
+            <textarea id="lNote" placeholder="e.g. We're preparing for a Series B raise..."></textarea>
+          </div>
+        </div>
+        <button class="lead-submit-btn" onclick="submitLead()">Send me the intelligence report</button>
+        <div class="lead-privacy">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="var(--muted)" stroke-width="2" stroke-linecap="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+          <p>Your information is used only to prepare and deliver your report. No spam, no cold calls unless you ask for one.</p>
+        </div>
+        <button class="lead-skip" onclick="backToWorkshop()">← Back to my workshop plan</button>
+      </div>
+      <div class="lead-success" id="leadSuccess">
+        <div class="lead-success-icon">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--success)" stroke-width="2.2" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
+        </div>
+        <h3>You're on the list</h3>
+        <p>We'll have your benchmarked intelligence report with you shortly.</p>
+        <button class="action-btn" style="margin-top:20px;" onclick="backToWorkshop()">← Back to workshop plan</button>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /container -->
+
+<script type="module" src="/js/app.js"></script>
+</body>
+</html>
