@@ -5,8 +5,38 @@ const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 let qType = 'mcq';
 let reportContent = '';
 
+/* ─── ROUTER ───────────────────────────────────────────────────────────────── */
+const ROUTES = {
+  '/admin/dashboard': 'dashboard',
+  '/admin/questions': 'questions',
+  '/admin/responses': 'responses',
+  '/admin/generate': 'generate',
+  '/admin': 'dashboard'
+};
+
+function getRouteFromPath(path) {
+  return ROUTES[path] || ROUTES['/admin'];
+}
+
+function navigateTo(path) {
+  history.pushState(null, '', path);
+  handleRoute();
+}
+
+window.navigateTo = navigateTo;
+
+function handleRoute() {
+  const path = window.location.pathname;
+  const tabName = getRouteFromPath(path);
+  showTab(tabName);
+}
+
+window.addEventListener('popstate', handleRoute);
+
 /* ─── INIT ─────────────────────────────────────────────────────────────────── */
 async function init() {
+  setupRouterLinks();
+  handleRoute();
   try {
     await loadDashboard();
     subscribeToChanges();
@@ -14,6 +44,15 @@ async function init() {
     console.error('Init error:', err);
   }
   hideLoading();
+}
+
+function setupRouterLinks() {
+  document.querySelectorAll('[data-route]').forEach(link => {
+    link.addEventListener('click', (e) => {
+      e.preventDefault();
+      navigateTo(link.getAttribute('href'));
+    });
+  });
 }
 
 function hideLoading() {
@@ -32,8 +71,12 @@ function showToast(message) {
 window.showTab = function(tabName) {
   document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
   document.querySelectorAll('.admin-nav-item').forEach(n => n.classList.remove('active'));
-  document.getElementById(`tab-${tabName}`).classList.add('active');
-  event.target.closest('.admin-nav-item').classList.add('active');
+  
+  const tabEl = document.getElementById(`tab-${tabName}`);
+  if (tabEl) tabEl.classList.add('active');
+  
+  const navLink = document.querySelector(`[data-route="${tabName}"]`);
+  if (navLink) navLink.classList.add('active');
   
   if (tabName === 'responses') loadResponses();
   if (tabName === 'questions') loadQuestions();

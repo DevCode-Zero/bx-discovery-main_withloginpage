@@ -64,6 +64,7 @@
 @keyframes pulse-dot{0%,100%{opacity:1;}50%{opacity:0.4;}}
 .tab-content{display:none;}
 .tab-content.active{display:block;}
+.admin-nav-item{text-decoration:none;}
 .loading-overlay{position:fixed;inset:0;background:rgba(255,255,255,0.9);display:flex;align-items:center;justify-content:center;z-index:100;}
 .loading-overlay .spinner{width:40px;height:40px;border:3px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin 1s linear infinite;}
 @keyframes spin{to{transform:rotate(360deg);}}
@@ -79,18 +80,18 @@
 <div class="admin-layout">
   <aside class="admin-sidebar">
     <div class="logo">BX <span>Admin</span></div>
-    <div class="admin-nav-item active" onclick="showTab('dashboard')">
+    <a href="/admin/dashboard" class="admin-nav-item" data-route="dashboard">
       <span class="icon">📊</span> Dashboard
-    </div>
-    <div class="admin-nav-item" onclick="showTab('questions')">
+    </a>
+    <a href="/admin/questions" class="admin-nav-item" data-route="questions">
       <span class="icon">❓</span> Questions
-    </div>
-    <div class="admin-nav-item" onclick="showTab('responses')">
+    </a>
+    <a href="/admin/responses" class="admin-nav-item" data-route="responses">
       <span class="icon">📝</span> Responses
-    </div>
-    <div class="admin-nav-item" onclick="showTab('generate')">
+    </a>
+    <a href="/admin/generate" class="admin-nav-item" data-route="generate">
       <span class="icon">🤖</span> Generate Report
-    </div>
+    </a>
     <div class="admin-nav-item" style="margin-top:auto;border-top:1px solid rgba(255,255,255,0.15);padding-top:16px;margin-top:40px;" onclick="window.location.href='/'">
       <span class="icon">←</span> Back to Login
     </div>
@@ -130,9 +131,9 @@
           <div class="admin-card-title">Quick Actions</div>
         </div>
         <div style="display:flex;gap:12px;flex-wrap:wrap;">
-          <button class="btn btn-primary" onclick="showTab('questions');setTimeout(showAddQuestion,100)">+ Add Question</button>
-          <button class="btn btn-secondary" onclick="showTab('responses')">View Responses</button>
-          <button class="btn btn-secondary" onclick="generateReport()">Generate AI Report</button>
+          <button class="btn btn-primary" onclick="navigateTo('/admin/questions');setTimeout(showAddQuestion,100)">+ Add Question</button>
+          <button class="btn btn-secondary" onclick="navigateTo('/admin/responses')">View Responses</button>
+          <button class="btn btn-secondary" onclick="navigateTo('/admin/generate')">Generate AI Report</button>
         </div>
       </div>
     </div>

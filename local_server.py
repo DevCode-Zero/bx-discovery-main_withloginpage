@@ -33,7 +33,7 @@ class LocalHandler(BaseHTTPRequestHandler):
         elif self.path == "/" or self.path == "/index.html":
             self.serve_file("/public/index.html")
         elif self.path.startswith("/admin"):
-            self.serve_file(f"/public{self.path}")
+            self.serve_file("/public/admin/index.html")
         elif self.path.startswith("/discovery"):
             self.serve_file(f"/public{self.path}")
         else:
