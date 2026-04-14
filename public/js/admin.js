@@ -117,7 +117,7 @@ window.submitQuestion = async function() {
       short: text,
       type: qType,
       options: options,
-      is_active: true
+      is_active: false
     });
     
     if (error) {
@@ -126,7 +126,7 @@ window.submitQuestion = async function() {
       return;
     }
     
-    showToast('Question added!');
+    showToast('Question added as draft.');
     hideAddQuestion();
     loadQuestions();
     updateQuestionCount();
@@ -137,6 +137,15 @@ window.submitQuestion = async function() {
 }
 
 async function loadQuestions() {
+  const { data: responseRows } = await supabase
+    .from('responses')
+    .select('question_id')
+    .eq('session_id', CURRENT_SESSION_ID);
+  const responseCountByQuestion = (responseRows || []).reduce((acc, row) => {
+    acc[row.question_id] = (acc[row.question_id] || 0) + 1;
+    return acc;
+  }, {});
+
   const { data: questions } = await supabase
     .from('questions')
     .select('*')
@@ -154,10 +163,11 @@ async function loadQuestions() {
     <div class="question-item ${q.is_active ? '' : 'inactive'}">
       <div class="q-info">
         <div class="q-title">${escapeHtml(q.short)}</div>
-        <div class="q-meta">${escapeHtml(q.question_text)} · ${q.type.toUpperCase()}</div>
+        <div class="q-meta">${escapeHtml(q.question_text)} · ${q.type.toUpperCase()} · ${responseCountByQuestion[q.id] || 0} responses</div>
       </div>
       <span class="q-status ${q.is_active ? 'active' : 'inactive'}">${q.is_active ? 'Active' : 'Inactive'}</span>
       <div class="actions">
+        <button class="btn btn-primary" onclick="pushQuestion('${q.id}')">Push</button>
         <button class="btn ${q.is_active ? 'btn-secondary' : 'btn-primary'}" onclick="toggleQuestion('${q.id}', ${!q.is_active})">
           ${q.is_active ? 'Deactivate' : 'Activate'}
         </button>
@@ -165,6 +175,26 @@ async function loadQuestions() {
       </div>
     </div>
   `).join('');
+}
+
+window.pushQuestion = async function(id) {
+  await supabase
+    .from('questions')
+    .update({ is_active: false })
+    .eq('session_id', CURRENT_SESSION_ID);
+
+  const { error } = await supabase
+    .from('questions')
+    .update({ is_active: true })
+    .eq('id', id);
+
+  if (error) {
+    alert('Failed to push question: ' + error.message);
+    return;
+  }
+  showToast('Question pushed to attendees!');
+  loadQuestions();
+  updateQuestionCount();
 }
 
 window.toggleQuestion = async function(id, isActive) {
